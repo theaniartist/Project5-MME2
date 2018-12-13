@@ -26,11 +26,33 @@ public class ExpressionEditor extends Application {
 	 * Mouse event handler for the entire pane that constitutes the ExpressionEditor
 	 */
 	private static class MouseEventHandler implements EventHandler<MouseEvent> {
+		
+		Pane _pane;
+		Expression _rootExpression;
+		Expression _expressionOfFocus;
+		
 		MouseEventHandler (Pane pane_, CompoundExpression rootExpression_) {
+			_pane = pane_;
+			_rootExpression = rootExpression_;
+			_expressionOfFocus = rootExpression_;
 		}
 
 		public void handle (MouseEvent event) {
 			if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+				for(ExpressionNode subExpr : ((ExpressionNode)_expressionOfFocus).getChildren())
+				{
+					if(subExpr.isClicked(event.getSceneX(), event.getSceneX()))
+					{
+						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.NO_BORDER);
+						_expressionOfFocus = subExpr;
+						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.RED_BORDER);
+					}
+					else
+					{
+						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.NO_BORDER);
+						_expressionOfFocus = _rootExpression;
+					}
+				}
 			} else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
 			} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			}
@@ -74,8 +96,8 @@ public class ExpressionEditor extends Application {
 					System.out.println(expression.convertToString(0));
 					expressionPane.getChildren().clear();
 					expressionPane.getChildren().add(expression.getNode());
-					expression.getNode().setLayoutX(WINDOW_WIDTH/4);
-					expression.getNode().setLayoutY(WINDOW_HEIGHT/2);
+					expression.getNode().setLayoutX(32);
+					expression.getNode().setLayoutY(WINDOW_HEIGHT/3);
 
 					// If the parsed expression is a CompoundExpression, then register some callbacks
 					if (expression instanceof CompoundExpression) {
