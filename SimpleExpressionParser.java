@@ -56,8 +56,10 @@ public class SimpleExpressionParser implements ExpressionParser {
 				{
 					CompoundExpression compoundExpression = new CompoundExpressionNode("" + operator);
 					compoundExpression.addSubexpression(leftSubexpression);
+					leftSubexpression.setParent(compoundExpression);
 					((HBox)compoundExpression.getNode()).getChildren().add(0, leftSubexpression.getNode());
 					compoundExpression.addSubexpression(rightSubexpression);
+					rightSubexpression.setParent(compoundExpression);
 					((HBox)compoundExpression.getNode()).getChildren().add(rightSubexpression.getNode());
 					return compoundExpression;
 				}
@@ -195,6 +197,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 				{
 					ParentheticalExpression parentheticalNode = new ParentheticalExpression("()");
 					parentheticalNode.addSubexpression(innerExpression);
+					innerExpression.setParent(parentheticalNode);
 					parentheticalNode.setLabel("(" + str.substring(1, closeParenthesisIndex) + ")");
 					CompoundExpressionNode nonTerminalNode;
 					if(closeParenthesisIndex + 1 != str.toCharArray().length)
@@ -204,8 +207,10 @@ public class SimpleExpressionParser implements ExpressionParser {
 							nonTerminalNode = new CompoundExpressionNode("" + str.charAt(closeParenthesisIndex + 1));
 							Expression restOfExpression = parseE(str.substring(closeParenthesisIndex + 2));
 							nonTerminalNode.addSubexpression(parentheticalNode);
+							parentheticalNode.setParent(nonTerminalNode);
 							((HBox)nonTerminalNode.getNode()).getChildren().add(0, parentheticalNode.getNode());
 							nonTerminalNode.addSubexpression(restOfExpression);
+							restOfExpression.setParent(nonTerminalNode);
 							((HBox)nonTerminalNode.getNode()).getChildren().add(restOfExpression.getNode());
 							return nonTerminalNode;
 						}

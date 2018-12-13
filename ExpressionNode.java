@@ -2,6 +2,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -31,6 +34,7 @@ public class ExpressionNode implements Expression
 			_parent = null;
 			_children = new LinkedList<ExpressionNode>();
 			_horizontalBox.getChildren().add(_label);
+			//((Pane)_horizontalBox).setBorder(Expression.RED_BORDER);
 		}
 		
 		/**
@@ -118,11 +122,24 @@ public class ExpressionNode implements Expression
 		{
 			_parent = parent;
 		}
-
-		public boolean isClicked(double mouseX, double mouseY)
+		
+		private double getGlobalCoordinate(BiFunction<Expression, Double, Double> callback, Expression expression, double value)
 		{
-			double hBoxX = _horizontalBox.getLayoutX() +  _horizontalBox.getTranslateX();
-			double hBoxY = _horizontalBox.getLayoutY() +  _horizontalBox.getTranslateY();
+			value = callback.apply(expression, value);
+			if(expression.getParent() == null)
+			{	
+				return value;
+			}
+			else
+			{
+				return getGlobalCoordinate(callback, expression.getParent(), value);
+			}
+		}
+
+		public boolean isClicked(Pane mainPane, double mouseX, double mouseY)
+		{
+			double hBoxX = getGlobalCoordinate((expression, value) -> value + expression.getNode().getLayoutX(), this, 0) + mainPane.getLayoutX();
+			double hBoxY = getGlobalCoordinate((expression, value) -> value + expression.getNode().getLayoutY(), this, 0) + mainPane.getLayoutY();
 			double hBoxX2 = hBoxX + _horizontalBox.getLayoutBounds().getWidth();
 			double hBoxY2 = hBoxY + _horizontalBox.getLayoutBounds().getHeight();
 			if(mouseX >= hBoxX && mouseX <= hBoxX2 && mouseY >= hBoxY && mouseY <= hBoxY2)

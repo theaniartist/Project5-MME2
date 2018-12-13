@@ -39,20 +39,26 @@ public class ExpressionEditor extends Application {
 
 		public void handle (MouseEvent event) {
 			if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+				double mouseX = event.getSceneX();
+				double mouseY = event.getSceneY();
+				boolean clicked = false;
 				for(ExpressionNode subExpr : ((ExpressionNode)_expressionOfFocus).getChildren())
 				{
-					if(subExpr.isClicked(event.getSceneX(), event.getSceneX()))
+					if(subExpr.isClicked(_pane, mouseX, mouseY))
 					{
 						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.NO_BORDER);
 						_expressionOfFocus = subExpr;
 						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.RED_BORDER);
-					}
-					else
-					{
-						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.NO_BORDER);
-						_expressionOfFocus = _rootExpression;
+						clicked = true;
 					}
 				}
+				if(!clicked)
+				{
+					((Pane) _expressionOfFocus.getNode()).setBorder(Expression.NO_BORDER);
+					_expressionOfFocus = _rootExpression;
+				}
+				//System.out.println(event.getSceneX());
+				//System.out.println(event.getSceneY());
 			} else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
 			} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			}
