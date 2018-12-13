@@ -158,11 +158,20 @@ public class ExpressionNode implements Expression
 	 * the copied Expression is as deep as possible.
 	 * @return the deep copy
 	 */
-		
-		public Expression deepCopy()
-		{
-			return null;
+
+	public Expression deepCopy()
+	{
+
+		final ExpressionNode expressionCopy = new ExpressionNode(_data);
+
+		for (ExpressionNode expression : _children) {
+
+			expressionCopy._children.add((ExpressionNode) expression.deepCopy());
+
 		}
+
+		return expressionCopy;
+	}
 
 	/**
 	 * Recursively flattens the expression as much as possible
