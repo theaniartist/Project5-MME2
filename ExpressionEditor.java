@@ -37,6 +37,19 @@ public class ExpressionEditor extends Application {
 			_expressionOfFocus = rootExpression_;
 		}
 
+
+		/**
+		 * Method handles a mouse event (either the mouse was pressed, dragged, or released) and
+		 * initiates a specific action once the user has done a mouse event. If the user clicks
+		 * on the expression, it initiated the MOUSE_PRESSED event which would set a red border around
+		 * that sub-expression that the user clicked on. If the user holds down on the mouse, it intiates
+		 * the MOUSE_DRAGGED event in which the user is able to drag the sub-expression. If the user releases
+		 * the mouse, it initiates the MOUSE_RELEASED event which would set the sub-expression to where it was
+		 * dragged and reset the translated x and y back to being 0.
+		 *
+		 * @param event the type of mouse event that responds to the user's actions
+		 */
+
 		public void handle (MouseEvent event) {
 			if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
 				double mouseX = event.getSceneX();

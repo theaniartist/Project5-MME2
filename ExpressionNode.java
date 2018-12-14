@@ -136,6 +136,17 @@ public class ExpressionNode implements Expression
 			}
 		}
 
+	/**
+	 * Method checks if what the user clicked on is within the bounding box of the expression that is shown on
+	 * the window.
+	 * @param mainPane the pane that displays the expression
+	 * @param mouseX the x-coordinate of the mouse click
+	 * @param mouseY the y-coordinate of the mouse click
+	 * @return a boolean value that if the click coordinates is within the bounding box of the expression,
+	 * then return true. If the clicj coordinates are not within the bounding box of the expression, return false.
+	 *
+	 */
+
 		public boolean isClicked(Pane mainPane, double mouseX, double mouseY)
 		{
 			double hBoxX = getGlobalCoordinate((expression, value) -> value + expression.getNode().getLayoutX(), this, 0) + mainPane.getLayoutX();

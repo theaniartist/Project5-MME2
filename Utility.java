@@ -5,7 +5,8 @@
 public class Utility 
 {
 	/**
-	 * 
+	 * Method checks if the string that is passed has any of the specificed characters that was also passed. If
+	 * there is an occurence, the counter would increment.
 	 * @param str The string which will be used to count the number of characters.
 	 * @param character The character to count the occurrences of.
 	 * @return Return the number of occurrences.
