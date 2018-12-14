@@ -232,6 +232,14 @@ public class SimpleExpressionParser implements ExpressionParser {
 			return parseL(str);
 		}
 	}
+
+	/**
+	 * Method checks for the production rule of L: whether the expression contains a literal
+	 * case of numbers or letters (from a-z). Also checks for whether the expression being passed
+	 * in contains any of the array of characters that should not be considered as a literal.
+	 * @param str the expression that is being checked for the production rule of L.
+	 * @return a boolean value whether it does or does not pass the test for the production rule of L
+	 */
 	
 	private static Expression parseL(String str)
 	{
@@ -249,6 +257,16 @@ public class SimpleExpressionParser implements ExpressionParser {
 		}
 		return new LiteralExpression(str);
 	}
+
+	/**
+	 * Checks if the expression being passed in is a valid expression that can be parsed.
+	 * @param str the String representation of the expression
+	 * @param operator the character representation of the operator that may be passed in (+,*,(), or a literal)
+	 * @param testLeftSubexpression function that tests for the left part of the expression (before the operator)
+	 * @param testRightSubexpression function that tests for the right part of the expression (after the operator)
+	 * @return a boolean value of whether or not the expression that is being passed in is valid to parse
+	 */
+
 	/*
 	private static boolean isValidExpression(String str)
 	{
