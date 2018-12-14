@@ -162,8 +162,15 @@ public class ExpressionNode implements Expression
 				return false;
 			}
 		}
-		
-		
+
+	/**
+	 * Method takes in an expression and gets the index of another expression to "swap" its location with.
+	 * The first part of the method swaps the expressions in the parsed expression tree by taking the indexes of
+	 * both expressions and setting them to each other. In the second part of the method, it swaps the expressions'
+	 * hboxes and setting them to each other.
+	 * @param expression the expression that is going to be swapped with
+	 */
+
 	public void swapWith(Expression expression)
 	{
 		//Swap branches of the tree!
