@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.scene.paint.Color;
 
 public class ExpressionEditor extends Application {
 	public static void main (String[] args) {
@@ -28,26 +29,36 @@ public class ExpressionEditor extends Application {
 	private static class MouseEventHandler implements EventHandler<MouseEvent> {
 		
 		Pane _pane;
-		Expression _rootExpression;
-		Expression _expressionOfFocus;
+		Expression _rootExpression, _expressionOfFocus, _expressionOfFocusCopy;
+		double _clickX, _clickY;
 		
 		MouseEventHandler (Pane pane_, CompoundExpression rootExpression_) {
 			_pane = pane_;
 			_rootExpression = rootExpression_;
 			_expressionOfFocus = rootExpression_;
+			_clickX = _clickY = 0;
 		}
 
 		public void handle (MouseEvent event) {
+			double currentMouseX = event.getSceneX();
+			double currentMouseY = event.getSceneY();
 			if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-				double mouseX = event.getSceneX();
-				double mouseY = event.getSceneY();
 				boolean clicked = false;
 				for(ExpressionNode subExpr : ((ExpressionNode)_expressionOfFocus).getChildren())
 				{
-					if(subExpr.isClicked(_pane, mouseX, mouseY))
+					if(subExpr.isClicked(_pane, currentMouseX, currentMouseY))
 					{
+						_clickX = currentMouseX;
+						_clickY = currentMouseY;
 						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.NO_BORDER);
 						_expressionOfFocus = subExpr;
+						_expressionOfFocusCopy = subExpr.deepCopy();
+						_pane.getChildren().add(_expressionOfFocusCopy.getNode());
+						_expressionOfFocusCopy.getNode().setLayoutX(((ExpressionNode)_expressionOfFocus).getGlobalCoordinate(
+								(expression, value) -> value + expression.getNode().getLayoutX(), _expressionOfFocus, 0));
+						_expressionOfFocusCopy.getNode().setLayoutY(((ExpressionNode)_expressionOfFocus).getGlobalCoordinate(
+								(expression, value) -> value + expression.getNode().getLayoutY(), _expressionOfFocus, 0));
+						_expressionOfFocusCopy.getNode().setTranslateY(_expressionOfFocus.getNode().getTranslateY());
 						((Pane) _expressionOfFocus.getNode()).setBorder(Expression.RED_BORDER);
 						clicked = true;
 					}
@@ -60,7 +71,54 @@ public class ExpressionEditor extends Application {
 				//System.out.println(event.getSceneX());
 				//System.out.println(event.getSceneY());
 			} else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+				if(!_rootExpression.equals(_expressionOfFocus))
+				{
+					((ExpressionNode)_expressionOfFocus).getLabel().setTextFill(Expression.GHOST_COLOR);
+					for(Expression child : ((ExpressionNode)_expressionOfFocus).getChildren())
+					{
+						((ExpressionNode)child).getLabel().setTextFill(Expression.GHOST_COLOR);
+					}
+					_expressionOfFocusCopy.getNode().setTranslateX(currentMouseX - _clickX);
+					_expressionOfFocusCopy.getNode().setTranslateY(currentMouseY - _clickY);
+					LinkedList<ExpressionNode> siblings = ((ExpressionNode)_expressionOfFocus.getParent()).getChildren();
+					int i = 0;
+					int indexOfFocusedExpression = siblings.indexOf(_expressionOfFocus);
+					while(i < siblings.size())
+					{
+						if(i != indexOfFocusedExpression)
+						{
+							if(i < indexOfFocusedExpression)
+							{
+								if(currentMouseX < siblings.get(i).getGlobalCoordinate(
+										(expression, value) -> value + expression.getNode().getLayoutX() + expression.getNode().getLayoutBounds().getWidth(), siblings.get(i), 0))
+								{
+									((ExpressionNode)_expressionOfFocus).swapWith(siblings.get(i));
+								}
+							} 
+							else if(i > indexOfFocusedExpression)
+							{
+								if(currentMouseX > siblings.get(i).getGlobalCoordinate(
+										(expression, value) -> value + expression.getNode().getLayoutX(), siblings.get(i), 0))
+								{
+									((ExpressionNode)_expressionOfFocus).swapWith(siblings.get(i));
+								}
+							}
+								
+						}
+						i++;
+					}
+				}
 			} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
+				System.out.println(_rootExpression.convertToString(0));
+				if(!_rootExpression.equals(_expressionOfFocus))
+				{
+					((ExpressionNode)_expressionOfFocus).getLabel().setTextFill(Color.BLACK);
+					for(Expression child : ((ExpressionNode)_expressionOfFocus).getChildren())
+					{
+						((ExpressionNode)child).getLabel().setTextFill(Color.BLACK);
+					}
+					_pane.getChildren().remove(_expressionOfFocusCopy.getNode());
+				}
 			}
 		}
 	}

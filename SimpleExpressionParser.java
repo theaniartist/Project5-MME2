@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.function.Function;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 
 /**
  * Starter code to implement an ExpressionParser. Your parser methods should use the following grammar:
@@ -195,10 +196,16 @@ public class SimpleExpressionParser implements ExpressionParser {
 				Expression innerExpression = parseE(str.substring(1, closeParenthesisIndex));
 				if(innerExpression != null)
 				{
-					ParentheticalExpression parentheticalNode = new ParentheticalExpression("()");
+					ParentheticalExpression parentheticalNode = new ParentheticalExpression("");
 					parentheticalNode.addSubexpression(innerExpression);
 					innerExpression.setParent(parentheticalNode);
-					parentheticalNode.setLabel("(" + str.substring(1, closeParenthesisIndex) + ")");
+					String labelSpacing = "";
+					for(char character : str.substring(1, closeParenthesisIndex).toCharArray())
+					{
+						labelSpacing += " ";
+					}
+					parentheticalNode.setLabel("(" + labelSpacing + ")");
+					((HBox)parentheticalNode.getNode()).getChildren().add(0, innerExpression.getNode());
 					CompoundExpressionNode nonTerminalNode;
 					if(closeParenthesisIndex + 1 != str.toCharArray().length)
 					{

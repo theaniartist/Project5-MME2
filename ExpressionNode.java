@@ -123,7 +123,7 @@ public class ExpressionNode implements Expression
 			_parent = parent;
 		}
 		
-		private double getGlobalCoordinate(BiFunction<Expression, Double, Double> callback, Expression expression, double value)
+		public double getGlobalCoordinate(BiFunction<Expression, Double, Double> callback, Expression expression, double value)
 		{
 			value = callback.apply(expression, value);
 			if(expression.getParent() == null)
@@ -152,6 +152,25 @@ public class ExpressionNode implements Expression
 			}
 		}
 		
+		
+	public void swapWith(Expression expression)
+	{
+		//Swap branches of the tree!
+		int indexOfThis = ((ExpressionNode)_parent)._children.indexOf(this);
+		int indexOfOther = ((ExpressionNode)_parent)._children.indexOf(expression);
+		ExpressionNode placeHolder = ((ExpressionNode)_parent)._children.get(indexOfThis);
+		((ExpressionNode)_parent)._children.set(indexOfThis, ((ExpressionNode)_parent)._children.get(indexOfOther));
+		((ExpressionNode)_parent)._children.set(indexOfOther, placeHolder);
+		
+		//Swap HBoxes!
+		//int indexOfParentLabel = ((HBox)_parent.getNode()).getChildren().indexOf(((ExpressionNode)_parent)._label);
+		int indexOfThisHBox = ((HBox)_parent.getNode()).getChildren().indexOf(_horizontalBox);
+		int indexOfOtherHBox = ((HBox)_parent.getNode()).getChildren().indexOf(expression.getNode());
+		((HBox)_parent.getNode()).getChildren().set(indexOfOtherHBox, new Label());
+		((HBox)_parent.getNode()).getChildren().set(indexOfThisHBox, expression.getNode());
+		((HBox)_parent.getNode()).getChildren().set(indexOfOtherHBox, _horizontalBox);
+	}
+		
 	/**
 	 * Creates and returns a deep copy of the expression.
 	 * The entire tree rooted at the target node is copied, i.e.,
@@ -161,15 +180,14 @@ public class ExpressionNode implements Expression
 
 	public Expression deepCopy()
 	{
-
-		final ExpressionNode expressionCopy = new ExpressionNode(_data);
-
-		for (ExpressionNode expression : _children) {
-
-			expressionCopy._children.add((ExpressionNode) expression.deepCopy());
-
+		final Expression expressionCopy = new ExpressionNode(_label.getText());
+		for (Expression expression : _children) {
+			((ExpressionNode)expressionCopy)._children.add((ExpressionNode) expression.deepCopy());
+			((HBox)expressionCopy.getNode()).getChildren().add(((ExpressionNode)expressionCopy)._children.getLast().getNode());
 		}
-
+		int indexOfLabel = _horizontalBox.getChildren().indexOf(_label);
+		((HBox)expressionCopy.getNode()).getChildren().remove(((ExpressionNode)expressionCopy).getLabel());
+		((HBox)expressionCopy.getNode()).getChildren().add(indexOfLabel,((ExpressionNode)expressionCopy).getLabel());
 		return expressionCopy;
 	}
 
@@ -192,7 +210,13 @@ public class ExpressionNode implements Expression
 					subExpr.flatten();
 					if (_label.getText().equals(subExpr._label.getText())) 
 					{
+						for(Expression child : subExpr.getChildren())
+						{
+							child.setParent((CompoundExpression)this);
+						}
 						_children.addAll(0, subExpr._children);
+						_horizontalBox.getChildren().addAll(0, ((HBox)subExpr.getNode()).getChildren());
+						_horizontalBox.getChildren().remove(subExpr.getNode());
 						_children.remove(subExpr);
 					}
 					i++;
